@@ -11,6 +11,7 @@ const profilesRoutes = require('./routes/profiles');
 const validationRoutes = require('./routes/validations');
 const matchRoutes = require('./routes/match');
 const searchOffersRoutes = require('./routes/searchOffers');
+const searchProfilesRoutes = require('./routes/searchProfiles');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/ofertas', offersRoutes);
@@ -19,6 +20,7 @@ app.use('/api/profiles', profilesRoutes);
 app.use('/api/validations', validationRoutes);
 app.use('/api/match', matchRoutes);
 app.use('/api/searchOffers', searchOffersRoutes);
+app.use('/api/searchProfiles', searchProfilesRoutes);
 
 
 const PORT = process.env.PORT || 3005;

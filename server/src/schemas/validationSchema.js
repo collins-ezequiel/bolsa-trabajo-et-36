@@ -3,8 +3,12 @@ const Joi = require('joi');
 
 const validationSchema = Joi.object({
     usuario_id: Joi.number().integer().required(),
-    titulo: Joi.string().max(255).required(),
+    titulo: Joi.string().required(),
     estado: Joi.string().valid('pendiente', 'aprobado', 'rechazado').optional()
+});
+
+const updateValidationSchema = Joi.object({
+    estado: Joi.string().valid('pendiente', 'aprobado', 'rechazado').required()
 });
 
 const idValidationSchema = Joi.object({
@@ -13,5 +17,6 @@ const idValidationSchema = Joi.object({
 
 module.exports = {
     validationSchema,
+    updateValidationSchema,
     idValidationSchema
 };

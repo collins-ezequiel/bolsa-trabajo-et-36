@@ -5,34 +5,35 @@ const searchOffers = async (req, res) => {
     try {
         const userId = req.user.id;
 
-        // Buscar el perfil del usuario
-        const perfil = await prisma.perfiles.findUnique({
+        const perfil = await prisma.perfiles.findFirst({
             where: { usuario_id: userId }
         });
 
-        if (!perfil) {
-            return res.status(404).json({ error: 'Perfil no encontrado' });
+        if (!perfil || !perfil.aptitudes || perfil.aptitudes.length === 0) {
+            return res.status(200).json([]);
         }
 
-        const aptitudes = perfil.aptitudes || [];
+        const aptitudes = perfil.aptitudes.map(a => a.toLowerCase());
 
-        if (aptitudes.length === 0) {
-            return res.status(200).json([]); // Sin aptitudes, no hay coincidencias
-        }
-
-        // Buscar ofertas que contengan al menos una de las aptitudes
         const ofertas = await prisma.ofertaslaborales.findMany({
-            where: {
-                requisitos: {
-                    hasSome: aptitudes // ← esto filtra por coincidencia de array
-                }
-            },
-            include: {
-                usuarios: true
-            }
+            include: { usuarios: true }
         });
 
-        res.json(ofertas);
+        // Match inteligente: comparar cada oferta
+        const ofertasConMatch = ofertas
+            .map(oferta => {
+                const requisitos = (oferta.requisitos || []).map(r => r.toLowerCase());
+                const coincidencias = aptitudes.filter(a => requisitos.includes(a));
+                return {
+                    ...oferta,
+                    coincidencias: coincidencias.length,
+                    aptitudes_matcheadas: coincidencias
+                };
+            })
+            .filter(oferta => oferta.coincidencias > 0) // Mostrar solo ofertas relevantes
+            .sort((a, b) => b.coincidencias - a.coincidencias); // Ordenar por coincidencias desc
+
+        res.json(ofertasConMatch);
     } catch (error) {
         console.error('Error en búsqueda de ofertas:', error);
         res.status(500).json({ error: error.message });

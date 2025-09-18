@@ -1,4 +1,3 @@
-// controllers/validationController.js
 const { prisma } = require('../../prisma/client');
 
 const createValidation = async (req, res) => {
@@ -43,13 +42,24 @@ const getValidationById = async (req, res) => {
 
 const updateValidation = async (req, res) => {
     try {
-        const updated = await prisma.validaciones.update({
-            where: { id: Number(req.params.id) },
-            data: {
-                estado: req.body.estado
-            }
+        const { estado } = req.body;
+        const validationId = Number(req.params.id);
+
+        // Primero actualizamos la validación
+        const updatedValidation = await prisma.validaciones.update({
+            where: { id: validationId },
+            data: { estado }
         });
-        res.json(updated);
+
+        // Si fue aprobado, actualizar el campo titulo_validado en el usuario
+        if (estado === 'aprobado') {
+            await prisma.usuarios.update({
+                where: { id: updatedValidation.usuario_id },
+                data: { titulo_validado: true }
+            });
+        }
+
+        res.json(updatedValidation);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
