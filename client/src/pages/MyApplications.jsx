@@ -1,37 +1,58 @@
-// src/pages/MyApplications.jsx
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import ApplicationCard from '../components/ApplicationCard';
+import React, { useEffect, useState } from "react";
+import api from "../services/api";
+import { useTranslation } from "react-i18next";
 
-function MyApplications() {
-    const [applications, setApplications] = useState([]);
+const MyApplications = () => {
+    const { t } = useTranslation();
+    const [apps, setApps] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchApplications = async () => {
+        try {
+            const { data } = await api.get("/postulations/mine");
+            setApps(data || []);
+        } catch (error) {
+            console.error("Error cargando postulaciones:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchApps = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                const res = await axios.get(
-                    `${process.env.REACT_APP_API_URL}` / postulaciones,
-                    { headers: { Authorization: Bearer`${token} ` } }
-                );
-                setApplications(res.data);
-            } catch (err) {
-                console.error('Error al cargar postulaciones', err);
-            }
-        };
-        fetchApps();
+        fetchApplications();
     }, []);
+
+    const Pill = ({ estado }) => {
+        const map = { aprobado: "success", rechazado: "danger", pendiente: "warning", cancelado: "secondary" };
+        const bs = map[estado] || "secondary";
+        return <span className={`badge bg-${bs}`}>{t(estado, estado)}</span>;
+    };
+
+    if (loading) return <p>{t("loading", "Cargando...")}</p>;
 
     return (
         <div className="container mt-4">
-            <h2>Mis Postulaciones</h2>
-            {applications.length === 0 ? (
-                <p>No tienes postulaciones todavía.</p>
+            <h2 className="mb-3">🗂️ {t("my_applications", "Mis Postulaciones")}</h2>
+
+            {apps.length === 0 ? (
+                <p>{t("no_applications", "No te has postulado a ninguna oferta.")}</p>
             ) : (
-                applications.map(app => <ApplicationCard key={app.id} app={app} />)
+                <div className="list-group">
+                    {apps.map((p) => (
+                        <div key={p.id} className="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <div className="fw-semibold">{p.ofertaslaborales?.titulo || t("unknown_offer", "Oferta desconocida")}</div>
+                                <small className="text-muted">
+                                    {t("company", "Empresa")}: {p.ofertaslaborales?.usuarios?.nombre || t("unknown_company", "Empresa desconocida")}
+                                </small>
+                            </div>
+                            <Pill estado={p.estado || "pendiente"} />
+                        </div>
+                    ))}
+                </div>
             )}
         </div>
     );
-}
+};
 
 export default MyApplications;

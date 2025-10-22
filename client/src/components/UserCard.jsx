@@ -1,17 +1,24 @@
-// src/components/UserCard.jsx
-import React from 'react';
+import React from "react";
+import { useTranslation } from "react-i18next";
 
-function UserCard({ user }) {
+const UserCard = ({ user, status }) => {
+    const { t } = useTranslation();
+
+    if (!user) return null;
+
     return (
-        <div className="card mb-3">
-            <div className="card-body">
-                <h5 className="card-title">{user.nombre} {user.apellido}</h5>
-                <p className="card-text">Email: {user.email}</p>
-                <p className="card-text">Rol: {user.rol}</p>
-                <p className="card-text">Título validado: {user.titulo_validado ? 'Sí' : 'No'}</p>
-            </div>
+        <div className="card p-3 mb-3 shadow-sm">
+            <h4>{user.name}</h4>
+            <p><b>{t("email")}:</b> {user.email}</p>
+            <p><b>{t("role")}:</b> {user.role}</p>
+            {user.skills && (
+                <p><b>{t("skills", "Habilidades")}:</b> {user.skills.join(", ")}</p>
+            )}
+            <p>
+                <b>{t("status", "Estado")}:</b> {status || t("pending", "Pendiente")}
+            </p>
         </div>
     );
-}
+};
 
 export default UserCard;

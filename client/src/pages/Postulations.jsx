@@ -1,39 +1,42 @@
-// src/pages/Postulations.jsx
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import ApplicationCard from '../components/ApplicationCard';
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import api from "../services/api";
+import UserCard from "../components/UserCard";
+import { toast } from "react-toastify";
 
-function Postulations() {
-    const [applications, setApplications] = useState([]);
+const Postulations = () => {
+    const { t } = useTranslation();
+    const [postulations, setPostulations] = useState([]);
+
+    const fetchPostulations = async () => {
+        try {
+            const res = await api.get("/postulations");
+            setPostulations(res.data);
+        } catch (err) {
+            console.error("Error al cargar postulaciones:", err);
+            toast.error(t("error_fetch_postulations", "Error al cargar postulaciones"));
+        }
+    };
 
     useEffect(() => {
-        const fetchPostulations = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                const res = await axios.get(
-                    `${process.env.REACT_APP_API_URL}` / postulations,
-                    {
-                        headers: { Authorization: Bearer`${token}` }
-                    }
-                );
-                setApplications(res.data);
-            } catch (err) {
-                console.error('Error al cargar postulaciones', err);
-            }
-        };
         fetchPostulations();
     }, []);
 
     return (
-        <div className="container mt-4">
-            <h2>Mis Postulaciones</h2>
-            {applications.length === 0 ? (
-                <p>No hay postulaciones aún.</p>
+        <div className="container py-4">
+            <h1>{t("postulations", "Postulaciones recibidas")}</h1>
+            {postulations.length === 0 ? (
+                <p>{t("no_postulations", "No hay postulaciones en tus ofertas")}</p>
             ) : (
-                applications.map(app => <ApplicationCard key={app.id} application={app} />)
+                postulations.map((p) => (
+                    <div key={p.id} className="mb-4">
+                        <h3>{t("offer", "Oferta")}: {p.offer.title}</h3>
+                        <UserCard user={p.user} status={p.status} />
+                    </div>
+                ))
             )}
         </div>
     );
-}
+};
 
 export default Postulations;

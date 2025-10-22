@@ -1,18 +1,20 @@
-// src/components/ApplicationCard.jsx
-import React from 'react';
+import React from "react";
+import { useTranslation } from "react-i18next";
 
-function ApplicationCard({ application }) {
+const ApplicationCard = ({ application }) => {
+    const { t } = useTranslation();
+
+    if (!application) return null;
+
     return (
-        <div className="card mb-3">
-            <div className="card-body">
-                <h5 className="card-title">Oferta: {application.ofertaslaborales?.titulo || 'Sin título'}</h5>
-                <p className="card-text">{application.mensaje || 'No se envió mensaje'}</p>
-                <p className="card-text">
-                    <small className="text-muted">Estado: {application.estado || 'pendiente'}</small>
-                </p>
-            </div>
+        <div className="card p-3 mb-3 shadow-sm">
+            <h3>{application.offer.title}</h3>
+            <p>{application.offer.description}</p>
+            <p>
+                <b>{t("status", "Estado")}:</b> {application.status || t("pending", "Pendiente")}
+            </p>
         </div>
     );
-}
+};
 
 export default ApplicationCard;
