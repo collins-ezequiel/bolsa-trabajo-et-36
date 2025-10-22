@@ -10,7 +10,13 @@ const idPostulationSchema = Joi.object({
     id: Joi.number().integer().positive().required()
 });
 
+// 🔹 Nuevo schema para actualizar estado de una postulación
+const updatePostulationSchema = Joi.object({
+    estado: Joi.string().valid('pendiente', 'aprobado', 'rechazado').required()
+});
+
 module.exports = {
     postulationSchema,
-    idPostulationSchema
+    idPostulationSchema,
+    updatePostulationSchema, 
 };
