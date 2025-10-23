@@ -11,8 +11,13 @@ import MyOffers from './pages/MyOffers';
 import AdminPanel from './pages/AdminPanel';
 import ProtectedRoute from './components/ProtectedRoute';
 import { useTranslation } from 'react-i18next';
+
 import 'bootswatch/dist/slate/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+<ToastContainer position="top-right" autoClose={3000} />
 
 function App() {
     const { t } = useTranslation();
@@ -20,6 +25,7 @@ function App() {
     return (
         <Router>
             <Navbar />
+            <ToastContainer position="top-right" autoClose={3000} />
             <Routes>
                 {/* Públicas */}
                 <Route path="/" element={<Home />} />

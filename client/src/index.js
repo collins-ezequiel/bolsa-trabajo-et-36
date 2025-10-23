@@ -5,6 +5,10 @@ import './i18n';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from "./context/AuthContext";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+<ToastContainer position="top-right" autoClose={3000} />
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
