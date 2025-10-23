@@ -1,4 +1,3 @@
-// controllers/matchController.js
 const { prisma } = require('../../prisma/client');
 
 const compareProfileToOffer = async (req, res) => {
@@ -18,26 +17,26 @@ const compareProfileToOffer = async (req, res) => {
 
         if (!perfil) return res.status(404).json({ error: 'Perfil no encontrado' });
 
-        const requisitos = oferta.requisitos || [];
-        const aptitudes = perfil.aptitudes || [];
+        const aptitudesOferta = oferta.requisitos || []; 
+        const aptitudesUsuario = perfil.aptitudes || [];
 
-        const detalle = requisitos.map(req => ({
-            requisito: req,
-            cumple: aptitudes.includes(req)
+        const detalle = aptitudesOferta.map(skill => ({
+            aptitud: skill,
+            cumple: aptitudesUsuario.includes(skill)
         }));
 
         const coincidencias = detalle.filter(d => d.cumple).length;
-        const resultado = {
-            coincidencias,
-            totalRequisitos: requisitos.length,
-            cumpleCon: requisitos.length > 0 ? Math.round((coincidencias / requisitos.length) * 100) : 0,
-            detalle
-        };
+        const porcentaje = aptitudesOferta.length > 0
+            ? Math.round((coincidencias / aptitudesOferta.length) * 100)
+            : 0;
 
-        res.json(resultado);
+        return res.status(200).json({ coincidencias, porcentaje, detalle });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Error comparando perfil con oferta:", error);
+        return res.status(500).json({ error: "Error interno del servidor" });
     }
 };
 
-module.exports = { compareProfileToOffer };
+module.exports = {
+    compareProfileToOffer,
+};
